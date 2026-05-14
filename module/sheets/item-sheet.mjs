@@ -75,8 +75,6 @@ export class lwfItemSheet extends LWFItemSheetBase {
       {
         // Whether to show secret blocks in the finished html
         secrets: this.document.isOwner,
-        // Necessary in v11, can be removed in v12
-        async: true,
         // Data to fill in for inline rolls
         rollData: this.item.getRollData(),
         // Relative UUID resolution
