@@ -6,8 +6,8 @@ This is a system to play the post-apocalyptic anime inspired ttrpg [Lone Wolf Fi
 
 ## Features
 - Character sheets for player characters, npcs/monsters, titans/disasters, vehicles, platoons, and squads.
-- Item sheets for forms, gupt kala, techniques, armor, weapons, titan anatomy/vehicle parts, monster abilities, and artifacts.
-- Packs with archetypes, weapons, armor, skills, masteries, and all 14 base Yuddhakala.
+- Item sheets for Forms, Gupt Kala, Techniques, armor, weapons, Titan anatomy/Vehicle parts, monster abilities, and Artifacts.
+- Packs with Archetypes, weapons, armor, Skills, Masteries, and all 14 base Yuddhakala.
 - Giving a character a technique from these packs that requires a Hell chakra will give them a Hell chakra
 - Roll effort by either clicking the effort icon on a character sheet, or by typing "/effort" then the number of dice to roll into chat (eg, "/effort 10" would roll 10 dice).
 - Fully editable initiative that automatically rerolls at the start of every round.
@@ -19,8 +19,8 @@ This is a system to play the post-apocalyptic anime inspired ttrpg [Lone Wolf Fi
 - Seperately track the health of each part of a Titan's anatomy.
 - Sort your techniques by type using a dropdown menu.
 - Forgotten what the skills do? Click on them at the side of your character sheet to access both the description and the effect chart.
-- Create custom artifacts, techniques, forms, and weapons.
-- If you're a gm, edit any non-character sheet by either pressing the edit button in the top right, or selecting the edit tab.
+- Create custom Artifacts, Techniques, Forms, and Weapons.
+- If you're a GM, edit any non-character sheet by either pressing the edit button in the top right, or selecting the edit tab.
 
 ## Known issues
 - The module dice so nice does not work with the dice rolling mechanic - no dice are rolled.
