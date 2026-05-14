@@ -1,3 +1,5 @@
+@use '../utils';
+
 // Grid.
 .grid,
 .grid-2col {
@@ -100,7 +102,7 @@
 
 .grid-table {
   margin: 0 !important;
-  border-bottom: 1px solid $c-faint;
+  border-bottom: 1px solid utils.$c-faint;
   gap: 0 3px;
   &:last-child { border-bottom: none; }
 }

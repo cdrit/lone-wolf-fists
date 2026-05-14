@@ -1,9 +1,11 @@
+@use '../utils';
+
 table {
   table-layout: fixed;
 }
 
 button {
-  font-family: $font-primary;
+  font-family: utils.$font-primary;
   
   &#prana-flare {
     font-size: 12px;
@@ -15,11 +17,11 @@ button {
 }
 
 .item-form {
-  font-family: $font-primary;
+  font-family: utils.$font-primary;
 }
 
 .editor {
-  font-family: $font-secondary;
+  font-family: utils.$font-secondary;
 }
 
 .edit-container {
@@ -73,19 +75,19 @@ button {
     > h4 {
       color: white;
       text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-      font-size: $effort-font-size;
+      font-size: utils.$effort-font-size;
     }
   }
 
   > h4 {
     text-shadow: -1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 1px 1px 0 #ffffff;
-    font-size: $effort-font-size;
+    font-size: utils.$effort-font-size;
   }
 }
 
 input#power-input {
     text-shadow: -1px -1px 0 #ffffff, 1px -1px 0 #ffffff, -1px 1px 0 #ffffff, 1px 1px 0 #ffffff;
-    font-size: $effort-font-size;
+    font-size: utils.$effort-font-size;
 }
 
 .health-max {
@@ -342,7 +344,7 @@ position: relative;
   }
 
   .profile-img {
-    flex: 0 0 $img-width;
+    flex: 0 0 utils.$img-width;
     height: 120px;
     justify-content: center;
     align-items: center;
@@ -439,7 +441,7 @@ position: relative;
 
 .tox {
   .tox-editor-container {
-    background: $c-white;
+    background: utils.$c-white;
   }
 
   .tox-edit-area {

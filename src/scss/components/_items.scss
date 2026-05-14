@@ -1,3 +1,5 @@
+@use '../utils';
+
 // Section Header
 .items-header {
   height: 25px;
@@ -5,7 +7,7 @@
   padding: 0;
   align-items: center;
   background: rgba(0, 0, 0, 0.05);
-  border: $border-groove;
+  border: utils.$border-groove;
   > * {
     font-size: 14px;
     text-align: center;
@@ -28,7 +30,7 @@
   padding: 0;
   overflow-y: auto;
   scrollbar-width: thin;
-  color: $c-tan;
+  color: utils.$c-tan;
 
   // Child lists
   .item-list {
@@ -68,13 +70,13 @@
   .item {
     align-items: center;
     padding: 0px 2px 2px 2px; // to align with the header border
-    border-bottom: 1px solid $c-faint;
+    border-bottom: 1px solid utils.$c-faint;
     &:last-child { 
       border-bottom: none;
       margin-bottom: 2px;
     }
     .item-name {
-      color: $c-dark;
+      color: utils.$c-dark;
       .item-image {
         flex: 0 0 30px;
         height: 30px;
@@ -100,7 +102,7 @@
     padding: 0;
     align-items: center;
     background: rgba(0, 0, 0, 0.05);
-    border: $border-groove;
+    border: utils.$border-groove;
     border-color: rgba(180, 180, 180, 0.5);
     > * {
       font-size: 12px;
