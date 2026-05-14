@@ -560,7 +560,53 @@ export class lwfActorSheet extends LWFActorSheetBase {
   /** @override */
   async _onRender(context, options) {
     await super._onRender(context, options);
+    this._activateSheetTabs();
     this.activateListeners($(this.element));
+  }
+
+  /**
+   * Activate tabbed navigation for actor sheets.
+   *
+   * Foundry's ApplicationV2 tab handler expects the clicked tab control to
+   * identify both its tab and group. The system's templates define the group
+   * on the navigation container, so this compatibility layer keeps the active
+   * tab and panel in sync for those sheets.
+   */
+  _activateSheetTabs() {
+    const root = this.element;
+    if (!root) return;
+
+    for (const nav of root.querySelectorAll('.tabs[data-group]')) {
+      const group = nav.dataset.group;
+      const tabs = nav.querySelectorAll('[data-tab]');
+      if (!group || !tabs.length) continue;
+
+      const activateTab = (tabId) => {
+        this.tabGroups[group] = tabId;
+        for (const tab of tabs) {
+          tab.classList.toggle('active', tab.dataset.tab === tabId);
+        }
+        for (const panel of root.querySelectorAll(`.tab[data-group="${group}"]`)) {
+          panel.classList.toggle('active', panel.dataset.tab === tabId);
+        }
+      };
+
+      activateTab(this.tabGroups[group] ?? tabs[0].dataset.tab);
+
+      nav.addEventListener('click', (event) => {
+        const tab = event.target.closest('[data-tab]');
+        if (!tab || !nav.contains(tab)) return;
+
+        event.preventDefault();
+        const tabId = tab.dataset.tab;
+        try {
+          this.changeTab(tabId, group, { event, navElement: tab, updatePosition: true });
+        } catch (_err) {
+          this.tabGroups[group] = tabId;
+        }
+        activateTab(this.tabGroups[group] ?? tabId);
+      });
+    }
   }
 
   async _onSubmit(event, form, formData) {
