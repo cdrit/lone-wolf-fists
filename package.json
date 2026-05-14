@@ -13,9 +13,7 @@
   "license": "MIT",
   "private": true,
   "devDependencies": {
-    "sass": "^1.53.0"
-  },
-  "dependencies": {
+    "sass": "^1.53.0",
     "madge": "^8.0.0"
   }
 }
