@@ -1,6 +1,7 @@
 # LWF System
 
 ![Foundry v14](https://img.shields.io/badge/foundry-v14-green)
+This system was originally created by El Gobbo from the discord, but since it isnt' being updated to v14, I'm getting Codex to do it.
 
 This is a system to play the post-apocalyptic anime inspired TTRPG [Lone Wolf Fists](https://www.drivethrurpg.com/en/product/416442/tian-shang-lone-wolf-fists-core-rulebook) using Foundry VTT version 14+. It has been built starting from the [Boilerplate system](https://github.com/asacolips-projects/boilerplate), and I consider it currently feature complete.
 
