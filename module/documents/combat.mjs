@@ -15,17 +15,17 @@ export class lwfCombat extends Combat {
   }
 
   async endCombat() {
-    return Dialog.confirm({
-      title: game.i18n.localize("COMBAT.EndTitle"),
+    return foundry.applications.api.DialogV2.confirm({
+      window: { title: game.i18n.localize("COMBAT.EndTitle") },
       content: `<p>${game.i18n.localize("COMBAT.EndConfirmation")}</p>`,
-      yes: async () => {
+      yes: { callback: async () => {
         const combatantList = this.combatants.map(c => c.actorId);
         for(let c in combatantList) {
           const combatant = await game.actors.get(combatantList[c]);
           chakraReset(combatant);
         }
         this.delete();
-      }
+      } }
     });
   }
 }

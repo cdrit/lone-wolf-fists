@@ -81,7 +81,7 @@ export class lwfItem extends Item {
       const roll = new Roll(rollData.formula, rollData.actor);
       // If you need to store the value first, uncomment the next line.
       // const result = await roll.evaluate();
-      roll.toMessage({
+      await roll.toMessage({
         speaker: speaker,
         rollMode: rollMode,
         flavor: label,
