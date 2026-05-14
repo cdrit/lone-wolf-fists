@@ -24,6 +24,7 @@ p {
   height: 35px;
   font-size: 25px;
 }
+
 .sheet-header img#ability-image {
   flex: 0 0 90px;
   height: 90px;
@@ -175,6 +176,7 @@ p {
   border-bottom: 1px solid #c9c7b8;
   gap: 0 3px;
 }
+
 .grid-table:last-child {
   border-bottom: none;
 }
@@ -359,6 +361,7 @@ p {
   display: inline-grid;
   box-sizing: border-box;
 }
+
 .inline-grid .individual-dice {
   height: 30px;
   width: 30px;

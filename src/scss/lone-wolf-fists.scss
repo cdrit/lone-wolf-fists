@@ -1,28 +1,24 @@
+@use 'sass:meta';
+@use 'utils/fonts';
+
 // Add custom fonts by visiting and search https://fonts.google.com
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-// Import utilities.
-@import 'utils/typography';
-@import 'utils/colors';
-@import 'utils/mixins';
-@import 'utils/variables';
-@import 'utils/fonts';
-
 /* Global styles */
-@import 'global/window';
-@import 'global/grid';
-@import 'global/flex';
-@import 'global/dice';
+@include meta.load-css('global/window');
+@include meta.load-css('global/grid');
+@include meta.load-css('global/flex');
+@include meta.load-css('global/dice');
 
 /* Styles limited to lone-wolf-fists sheets */
 .lone-wolf-fists {
-  @import 'components/forms';
-  @import 'components/resource';
-  @import 'components/items';
-  @import 'components/effects';
+  @include meta.load-css('components/forms');
+  @include meta.load-css('components/resource');
+  @include meta.load-css('components/items');
+  @include meta.load-css('components/effects');
 
   /* Styles limited to specific sheets */
-  @import 'sheets/groups';
-  @import 'sheets/titans';
-  @import 'sheets/domains';
+  @include meta.load-css('sheets/groups');
+  @include meta.load-css('sheets/titans');
+  @include meta.load-css('sheets/domains');
 }
