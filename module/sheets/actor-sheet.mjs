@@ -13,26 +13,34 @@ import { chakraReset } from '../helpers/chakra-reset.mjs';
 import { productList } from '../helpers/nodes.mjs';
 import { LWFDOMAINS } from '../helpers/domains.mjs';
 
+const { HandlebarsApplicationMixin } = foundry.applications.api;
+const { ActorSheetV2 } = foundry.applications.sheets;
+
+const LWFActorSheetBase = HandlebarsApplicationMixin(ActorSheetV2);
+
 /**
- * Extend the basic ActorSheet with some very simple modifications
- * @extends {ActorSheet}
+ * Extend the basic ActorSheet with some very simple modifications.
+ * @extends {ActorSheetV2}
  */
-export class lwfActorSheet extends foundry.appv1.sheets.ActorSheet {
-  /** @override */
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      classes: ['lone-wolf-fists', 'sheet', 'actor'],
-      width: 830,
-      height: 800,
-      tabs: [
-        {
-          navSelector: '.sheet-tabs',
-          contentSelector: '.sheet-body',
-          initial: 'core',
-        },
-      ],
-    });
-  }
+export class lwfActorSheet extends LWFActorSheetBase {
+  static DEFAULT_OPTIONS = {
+    classes: ['lone-wolf-fists', 'sheet', 'actor'],
+    position: { width: 830, height: 800 },
+    window: { resizable: true },
+    form: {
+      closeOnSubmit: false,
+      submitOnChange: true,
+      handler: async function(event, form, formData) {
+        return this._onSubmit(event, form, formData);
+      },
+    },
+  };
+
+  static PARTS = {
+    form: { template: '' },
+  };
+
+  tabGroups = { primary: 'core' };
 
   /** @override */
   get template() {
@@ -42,19 +50,30 @@ export class lwfActorSheet extends foundry.appv1.sheets.ActorSheet {
   /* -------------------------------------------- */
 
   /** @override */
-  async getData() {
+  _configureRenderParts(options) {
+    const parts = super._configureRenderParts(options);
+    parts.form.template = this.template;
+    return parts;
+  }
+
+  /** @override */
+  async _prepareContext(options) {
     // Retrieve the data structure from the base sheet. You can inspect or log
     // the context variable to see the structure, but some key properties for
     // sheets are the actor object, the data object, whether or not it's
     // editable, the items array, and the effects array.
-    const context = super.getData();
+    const context = await super._prepareContext(options);
 
     // Use a safe clone of the actor data for further operations.
     const actorData = this.document.toPlainObject();
 
     // Add the actor's data to context.data for easier access, as well as flags.
+    context.actor = this.actor;
+    context.document = this.document;
+    context.items = Array.from(this.actor.items);
     context.system = actorData.system;
     context.flags = actorData.flags;
+    context.cssClass = [this.isEditable ? 'editable' : 'locked', this.actor.type].join(' ');
 
     // Adding a pointer to CONFIG.LWF
     context.config = CONFIG.LWFIMBALANCES;
@@ -85,13 +104,14 @@ export class lwfActorSheet extends foundry.appv1.sheets.ActorSheet {
     }
 
     if(actorData.type === 'domain') {
-      this._prepareDomain(context);
+      await this._prepareDomain(context);
     }
 
     if(actorData.type === 'vehicle') {
       this._prepareVehicle(context);
     }
     context.isGM = game.user.isGM;
+    context.editable = this.isEditable;
 
     // Enrich biography info for display
     // Enrichment turns text like `[[/r 1d20]]` into buttons
@@ -493,8 +513,18 @@ export class lwfActorSheet extends foundry.appv1.sheets.ActorSheet {
   };
 
   /** @override */
+  async _onRender(context, options) {
+    await super._onRender(context, options);
+    this.activateListeners($(this.element));
+  }
+
+  async _onSubmit(event, form, formData) {
+    const updateData = foundry.utils.expandObject(formData.object);
+    return this.document.update(updateData);
+  }
+
+  /** @override */
   activateListeners(html) {
-    super.activateListeners(html);
 
     // Render the item sheet for viewing/editing prior to the editable check.
     html.on('click', '.item-edit', (ev) => {
@@ -548,21 +578,22 @@ export class lwfActorSheet extends foundry.appv1.sheets.ActorSheet {
     })
 
     html.on('click', '#rest-button', async () => {
-      const restHTML = await renderTemplate('systems/lone-wolf-fists/templates/popups/popup-rest.hbs');
-      const restData = await Dialog.wait({
-        title: "How long would you like to rest?",
+      const restHTML = await foundry.applications.handlebars.renderTemplate('systems/lone-wolf-fists/templates/popups/popup-rest.hbs');
+      const restData = await foundry.applications.api.DialogV2.wait({
+        window: { title: "How long would you like to rest?" },
         content: restHTML,
-        buttons:{
-          submit: {
-            label: "Rest",
-            callback: (html) => {
-              const formElement = html[0].querySelector('form');
-              const formData = new FormDataExtended(formElement);
-              return formData.object;
-            }
+        buttons: [{
+          action: "submit",
+          label: "Rest",
+          default: true,
+          callback: (event, button) => {
+            const formData = new FormDataExtended(button.form);
+            return formData.object;
           }
-        }
+        }]
       });
+
+      if(!restData) return;
 
       if(restData["full-rest"] === "true"){
         this.actor.update({[ `system.health.value` ]: this.actor.system.health.max
@@ -598,21 +629,22 @@ export class lwfActorSheet extends foundry.appv1.sheets.ActorSheet {
       const missing = pack.filter(({name}) => names.includes(name));
       const difference = parseInt(ev.currentTarget.dataset.missing);
       const masteries = {"missing": missing, "difference": difference};
-      const masteryHTML = await renderTemplate('systems/lone-wolf-fists/templates/popups/popup-masteries.hbs', masteries)
-      const choices = await Dialog.wait ({
-        title: "Choose your mastery",
+      const masteryHTML = await foundry.applications.handlebars.renderTemplate('systems/lone-wolf-fists/templates/popups/popup-masteries.hbs', masteries)
+      const choices = await foundry.applications.api.DialogV2.wait({
+        window: { title: "Choose your mastery" },
         content: masteryHTML,
-        buttons:{
-          submit: {
-            label: "Master",
-            callback: (html) => {
-              const formElement = html[0].querySelector('form');
-              const formData = new FormDataExtended(formElement);
-              return formData.object;
-            }
+        buttons: [{
+          action: "submit",
+          label: "Master",
+          default: true,
+          callback: (event, button) => {
+            const formData = new FormDataExtended(button.form);
+            return formData.object;
           }
-        }
+        }]
       });
+      if(!choices) return;
+
       let items = this.actor.items.map(i => i.toObject());
       for(let i in choices){
         if (choices[i] !== null){
@@ -653,7 +685,7 @@ export class lwfActorSheet extends foundry.appv1.sheets.ActorSheet {
       const artifacts = this.actor.items.filter(i => i.type === "artifact")
       let extraPrana = 0;
       if(artifacts.length > 0){
-        for (const artifact in artifacts){
+        for (const artifact of artifacts){
           if(!artifact.system.chakra.hasChakra || 
             artifact.system.chakra.recovery <= 0 ||
             (!artifact.system.worn && !artifact.system.held)){
@@ -739,7 +771,7 @@ export class lwfActorSheet extends foundry.appv1.sheets.ActorSheet {
     })
 
     html.on('change', '#membership-set', (ev) => {
-      const value = ev.currentTarget.value;
+      let value = ev.currentTarget.value;
       if (value > 100)
         value = 100;
       else if (value < 0)
@@ -811,7 +843,7 @@ export class lwfActorSheet extends foundry.appv1.sheets.ActorSheet {
     // Get the type of item to create.
     const type = header.dataset.type;
     // Grab any data associated with this control.
-    const data = duplicate(header.dataset);
+    const data = foundry.utils.deepClone(header.dataset);
     // Initialize a default name.
     const name = `New ${type.capitalize()}`;
     // Prepare the item object.

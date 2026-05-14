@@ -15,22 +15,30 @@ import { LWFIMBALANCES } from '../helpers/imbalance-config.mjs';
  * Extend the basic ItemSheet with some very simple modifications
  * @extends {ItemSheet}
  */
-export class lwfItemSheet extends foundry.appv1.sheets.ItemSheet {
-  /** @override */
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      classes: ['lone-wolf-fists', 'sheet', 'item'],
-      width: 400,
-      height: 600,
-      tabs: [
-        {
-          navSelector: '.sheet-tabs',
-          contentSelector: '.sheet-body',
-          initial: 'description',
-        },
-      ],
-    });
-  }
+const { HandlebarsApplicationMixin } = foundry.applications.api;
+const { ItemSheetV2 } = foundry.applications.sheets;
+
+const LWFItemSheetBase = HandlebarsApplicationMixin(ItemSheetV2);
+
+export class lwfItemSheet extends LWFItemSheetBase {
+  static DEFAULT_OPTIONS = {
+    classes: ['lone-wolf-fists', 'sheet', 'item'],
+    position: { width: 400, height: 600 },
+    window: { resizable: true },
+    form: {
+      closeOnSubmit: false,
+      submitOnChange: true,
+      handler: async function(event, form, formData) {
+        return this._onSubmit(event, form, formData);
+      },
+    },
+  };
+
+  static PARTS = {
+    form: { template: '' },
+  };
+
+  tabGroups = { primary: 'description' };
 
   /** @override */
   get template() {
@@ -46,9 +54,16 @@ export class lwfItemSheet extends foundry.appv1.sheets.ItemSheet {
   /* -------------------------------------------- */
 
   /** @override */
-  async getData() {
+  _configureRenderParts(options) {
+    const parts = super._configureRenderParts(options);
+    parts.form.template = this.template;
+    return parts;
+  }
+
+  /** @override */
+  async _prepareContext(options) {
     // Retrieve base data structure.
-    const context = super.getData();
+    const context = await super._prepareContext(options);
 
     // Use a safe clone of the item data for further operations.
     const itemData = this.document.toPlainObject();
@@ -70,8 +85,11 @@ export class lwfItemSheet extends foundry.appv1.sheets.ItemSheet {
     );
 
     // Add the item's data to context.data for easier access, as well as flags.
+    context.item = this.item;
+    context.document = this.document;
     context.system = itemData.system;
     context.flags = itemData.flags;
+    context.cssClass = [this.isEditable ? 'editable' : 'locked', this.item.type].join(' ');
 
     // Adding a pointer to CONFIG.LWF
     context.config = CONFIG.LWF;
@@ -105,7 +123,7 @@ export class lwfItemSheet extends foundry.appv1.sheets.ItemSheet {
     if(itemData.type === 'anatomy') {
       let onslaughtName;
       const onslaughts = this.item.parent?.items?.filter(i => (i.type === 'ability'));
-      const linkedOnslaught = onslaughts?.filter(o => (o._id === context.system.linkedOnslaught));
+      const linkedOnslaught = onslaughts?.find(o => (o._id === context.system.linkedOnslaught));
       if(linkedOnslaught === undefined)
         onslaughtName = "None";
       else {
@@ -134,15 +152,26 @@ export class lwfItemSheet extends foundry.appv1.sheets.ItemSheet {
 
     context.isGM = game.user.isGM;
     context.duration = LWFABILITIES.durations;
+    context.editable = this.isEditable;
 
     return context;
+  }
+
+  /** @override */
+  async _onRender(context, options) {
+    await super._onRender(context, options);
+    this.activateListeners($(this.element));
+  }
+
+  async _onSubmit(event, form, formData) {
+    const updateData = foundry.utils.expandObject(formData.object);
+    return this.document.update(updateData);
   }
 
   /* -------------------------------------------- */
 
   /** @override */
   activateListeners(html) {
-    super.activateListeners(html);
 
     // Everything below here is only needed if the sheet is editable
     if (!this.isEditable) return;

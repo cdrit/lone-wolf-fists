@@ -87,12 +87,12 @@ Hooks.once('init', function () {
   CONFIG.ActiveEffect.legacyTransferral = false;
 
   // Register sheet application classes
-  foundry.documents.collections.Actors.unregisterSheet('core', foundry.appv1.sheets.ActorSheet);
+  foundry.documents.collections.Actors.unregisterSheet('core', foundry.applications.sheets.ActorSheetV2);
   foundry.documents.collections.Actors.registerSheet('lone-wolf-fists', lwfActorSheet, {
     makeDefault: true,
     label: 'LWF.SheetLabels.Actor',
   });
-  foundry.documents.collections.Items.unregisterSheet('core', foundry.appv1.sheets.ItemSheet);
+  foundry.documents.collections.Items.unregisterSheet('core', foundry.applications.sheets.ItemSheetV2);
   foundry.documents.collections.Items.registerSheet('lone-wolf-fists', lwfItemSheet, {
     makeDefault: true,
     label: 'LWF.SheetLabels.Item',
@@ -159,11 +159,13 @@ Hooks.on('chatMessage', (_, messageText, data) => {
 })
 
 // Dashed outline of sets when clicked
-Hooks.on('renderChatLog', () => {
-  $('#chat-log').on('click', '.dice-set', (ev) => {
-    const targetDiv = ev.currentTarget;
-    targetDiv.classList.toggle('selected-set')
-  })
+Hooks.on('renderChatLog', (_app, html) => {
+  const chatLog = html instanceof HTMLElement ? html : html?.[0];
+  chatLog?.addEventListener('click', (ev) => {
+    const targetDiv = ev.target.closest?.('.dice-set');
+    if (!targetDiv) return;
+    targetDiv.classList.toggle('selected-set');
+  });
 })
 
 
