@@ -8,8 +8,7 @@
         <a
           class='item-control item-create'
           title='{{localize "DOCUMENT.Create" type='Item'}}'
-          data-type='item'
-        >
+          data-type='item' data-action="createItem">
           <i class='fas fa-plus'></i>
         </a>
       </div>
@@ -19,8 +18,7 @@
       <div class='item-name grid-span-4 flexrow'>
         <a
           class='item-control item-edit flexrow flex-group-center'
-          title='{{localize "DOCUMENT.Update" type='Item'}}'
-        >
+          title='{{localize "DOCUMENT.Update" type='Item'}}' data-action="editItem">
         <div class='item-image'>
           <img
             src='{{item.img}}'
@@ -47,8 +45,7 @@
       <div class='item-controls'>
         <a
           class='item-control item-delete'
-          title='{{localize "DOCUMENT.Delete" type='Item'}}'
-        >
+          title='{{localize "DOCUMENT.Delete" type='Item'}}' data-action="deleteItem">
           <i class='fas fa-trash'></i>
         </a>
       </div>

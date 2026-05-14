@@ -164,9 +164,9 @@
       {{#if isGM}}
       <div class="full-size edit-container">
         {{#if system.editMode}}
-        <i id="edit-mode" class="fa-solid fa-gear edit-mode-on">Play</i>
+        <i id="edit-mode" class="fa-solid fa-gear edit-mode-on" data-action="toggleEditMode">Play</i>
         {{else}}
-        <i id="edit-mode" class="fa-solid fa-gear edit-mode-off">Edit</i>
+        <i id="edit-mode" class="fa-solid fa-gear edit-mode-off" data-action="toggleEditMode">Edit</i>
         {{/if}}
       </div>
       {{/if}}
@@ -197,8 +197,7 @@
                   class='item-control item-create'
                   title='Create item'
                   data-type='anatomy'
-                  data-systemToggle= true
-                >
+                  data-systemToggle= true data-action="createItem">
                   <i class='fas fa-plus'></i>
                 </a>
             </div>
@@ -209,8 +208,7 @@
               <div class='item-name grid-span-3 flexrow'>
                 <a
                   class='item-control item-edit'
-                  title='{{localize "DOCUMENT.Update" type='Item'}}'
-                >
+                  title='{{localize "DOCUMENT.Update" type='Item'}}' data-action="editItem">
                 <h4>{{item.name}}</h4>
                 </a>
               </div>
@@ -223,8 +221,7 @@
               <div class="item-controls">
                 <a
                   class='item-control item-delete'
-                  title='{{localize "DOCUMENT.Delete" type='Item'}}'
-                >
+                  title='{{localize "DOCUMENT.Delete" type='Item'}}' data-action="deleteItem">
                   <i class='fas fa-trash'></i>
                 </a>
               </div>
@@ -235,8 +232,7 @@
               <div class='item-name grid-span-3 flexrow'>
                 <a
                   class='item-control item-edit'
-                  title='{{localize "DOCUMENT.Update" type='Item'}}'
-                >
+                  title='{{localize "DOCUMENT.Update" type='Item'}}' data-action="editItem">
                 <h4>{{item.name}}</h4>
                 </a>
               </div>
@@ -246,8 +242,7 @@
               <div class="item-controls">
                 <a
                   class='item-control item-delete'
-                  title='{{localize "DOCUMENT.Delete" type='Item'}}'
-                >
+                  title='{{localize "DOCUMENT.Delete" type='Item'}}' data-action="deleteItem">
                   <i class='fas fa-trash'></i>
                 </a>
               </div>

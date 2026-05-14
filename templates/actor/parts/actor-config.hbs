@@ -9,7 +9,7 @@
       <div class="item-type">{{item.type}}</div>
       <div class='item-name'>
         <div class='item-image'>
-          <a class='rollable' data-roll-type='item'>
+          <a class='rollable' data-roll-type='item' data-action="roll">
             <img
               src='{{item.img}}'
               title='{{item.name}}'
@@ -23,8 +23,7 @@
       <div class='item-controls'>
         <a
           class='item-control item-delete'
-          title='{{localize "DOCUMENT.Delete" type='Item'}}'
-        >
+          title='{{localize "DOCUMENT.Delete" type='Item'}}' data-action="deleteItem">
           <i class='fas fa-trash'></i>
         </a>
       </div>

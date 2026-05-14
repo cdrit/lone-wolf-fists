@@ -24,7 +24,7 @@
         {{#if system.editMode}}
         <input id="power-input" class="smallish-box short-box" type="text" name="system.power.lvl" value="{{system.power.lvl}}" data-dtype="Number">
         {{else}}
-        <div id="effort-display" class="flex-group-center flex">
+        <div id="effort-display" class="flex-group-center flex" data-action="rollEffort">
           <h4 id="power-input"><strong>{{system.power.lvl}}</strong></h4>
         </div>
         {{/if}}
@@ -92,9 +92,9 @@
         {{#if isGM}}
         <div class="full-size edit-container">
           {{#if system.editMode}}
-          <i id="edit-mode" class="fa-solid fa-gear edit-mode-on">Play</i>
+          <i id="edit-mode" class="fa-solid fa-gear edit-mode-on" data-action="toggleEditMode">Play</i>
           {{else}}
-          <i id="edit-mode" class="fa-solid fa-gear edit-mode-off">Edit</i>
+          <i id="edit-mode" class="fa-solid fa-gear edit-mode-off" data-action="toggleEditMode">Edit</i>
           {{/if}}
         </div>
         {{/if}}
@@ -182,8 +182,7 @@
                 <div class="item-controls">
                   <a
                     class='item-control item-delete'
-                    title='{{localize "DOCUMENT.Delete" type='Item'}}'
-                  >
+                    title='{{localize "DOCUMENT.Delete" type='Item'}}' data-action="deleteItem">
                     <i class="fa-solid fa-x" style="color: #ff1c2d;"></i>
                   </a>
                 </div>
@@ -191,8 +190,7 @@
               {{else}}
               <a
                 class='item-control item-edit flex-column flex-group-center'
-                title='{{localize "DOCUMENT.Update" type='Item'}}'
-              >
+                title='{{localize "DOCUMENT.Update" type='Item'}}' data-action="editItem">
               <h4>{{anatomy.name}}</h4>
               </a>
               {{/if}}
@@ -251,8 +249,7 @@
             <div class="item" data-item-id="{{anatomy.system.linkedOnslaught}}">
               <a
                 class='item-control item-edit item-name'
-                title='{{localize "DOCUMENT.Update" type='Item'}}'
-              >
+                title='{{localize "DOCUMENT.Update" type='Item'}}' data-action="editItem">
               <h4>{{anatomy.onslaughtName}}</h4>
               <span>{{anatomy.onslaughtFrequency}}</span>
               </a>
@@ -264,8 +261,7 @@
             <a
               class='item-control item-create'
               title='Create item'
-              data-type='anatomy'
-            >
+              data-type='anatomy' data-action="createItem">
               <i class='fas fa-plus fa-2xl'></i>
             </a>
           </div>
@@ -286,8 +282,7 @@
                   class='item-control item-create'
                   title='Create item'
                   data-type='ability'
-                  data-subtype='Power'
-                >
+                  data-subtype='Power' data-action="createItem">
                   <i class='fas fa-plus'></i>
                 </a>
             </div>
@@ -305,8 +300,7 @@
                 />
                 <a
                   class='item-control item-edit'
-                  title='{{localize "DOCUMENT.Update" type='Item'}}'
-                >
+                  title='{{localize "DOCUMENT.Update" type='Item'}}' data-action="editItem">
                 <h4>{{item.name}}</h4>
                 </a>
               </div>
@@ -316,8 +310,7 @@
               <div class="item-controls">
                 <a
                   class='item-control item-delete'
-                  title='{{localize "DOCUMENT.Delete" type='Item'}}'
-                >
+                  title='{{localize "DOCUMENT.Delete" type='Item'}}' data-action="deleteItem">
                   <i class='fas fa-trash'></i>
                 </a>
               </div>

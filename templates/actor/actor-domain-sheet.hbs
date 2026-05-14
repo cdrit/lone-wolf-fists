@@ -24,7 +24,7 @@
       </div>
       <div id="effort" class="resource flex-group-center flex-column npc-sidebar">
         <label for="power-input" class="resource-label">Ruler Effort</label>
-        <div id="effort-display" class="flex-group-center flex">
+        <div id="effort-display" class="flex-group-center flex" data-action="rollEffort">
           <h4 id="power-input"><strong>{{ruler.system.power.lvl}}</strong></h4>
         </div>
       </div>
@@ -104,8 +104,7 @@
                 <a
                   class='item-control item-create'
                   title='Create item'
-                  data-type='node'
-                >
+                  data-type='node' data-action="createItem">
                   <i class='fas fa-plus'></i>
                 </a>
             </div>
@@ -116,8 +115,7 @@
               <div class='item-name flex-group-center grid-span-3' data-imbtype="name">
                 <a
                   class='item-control item-edit item-name'
-                  title='{{localize "DOCUMENT.Update" type='Item'}}'
-                >
+                  title='{{localize "DOCUMENT.Update" type='Item'}}' data-action="editItem">
                   <h4>{{item.system.richness.name}} {{item.system.nodeType.name}} Node</h4>
                 </a>
               </div> 
@@ -154,8 +152,7 @@
               <div class="item-controls flex-group-center">
                   <a
                     class='item-control item-delete'
-                    title='{{localize "DOCUMENT.Delete" type='imbalance'}}'
-                  >
+                    title='{{localize "DOCUMENT.Delete" type='imbalance'}}' data-action="deleteItem">
                     <i class='fas fa-trash'></i>
                   </a>
               </div>

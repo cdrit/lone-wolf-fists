@@ -3,10 +3,10 @@
     <li class="prana resources">
     <div class="resource flex-group-center">
         <div>
-            <button class="technique-header" type="button" id="prana-flare">Prana Flare</button>
+            <button class="technique-header" type="button" id="prana-flare" data-action="pranaFlare">Prana Flare</button>
         </div>
         <div>
-            <button class="technique-header" type="button" id="recover-prana">Reset Prana</button>
+            <button class="technique-header" type="button" id="recover-prana" data-action="recoverPrana">Reset Prana</button>
         </div>
         <label for="system.prana.value" class="resource-label">Prana</label>
         <div class="resource-content flexrow flex-center flex-between">
@@ -38,7 +38,7 @@
         title='Open Chakra'
         width='10'
         height='10'
-        />
+        data-action="increaseChakra"/>
         {{/unless}}
         {{#unless (comparison system.chakras.value minChakras)}}
         <img
@@ -47,7 +47,7 @@
         title='Close Chakra'
         width='10'
         height='10'
-        />
+        data-action="decreaseChakra"/>
         {{/unless}}
     </div>
     </li>
@@ -64,7 +64,7 @@
         title='{{skill}}'
         width='40'
         height='40'
-        />
+        data-action="toggleChakra"/>
     </div>
     <h4 class="skill">
     {{#if (lookup ../system.chakras.awakened skill)}}<strong>{{skill}}</strong>
