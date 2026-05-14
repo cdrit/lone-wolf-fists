@@ -164,9 +164,9 @@
       {{#if isGM}}
       <div class="full-size edit-container">
         {{#if system.editMode}}
-        <i id="edit-mode" class="fa-solid fa-gear edit-mode-on" data-action="toggleEditMode">Play</i>
+        <button type="button" class="edit-mode-button edit-mode-on" data-action="toggleEditMode"><i class="fa-solid fa-gear"></i> Play</button>
         {{else}}
-        <i id="edit-mode" class="fa-solid fa-gear edit-mode-off" data-action="toggleEditMode">Edit</i>
+        <button type="button" class="edit-mode-button edit-mode-off" data-action="toggleEditMode"><i class="fa-solid fa-gear"></i> Edit</button>
         {{/if}}
       </div>
       {{/if}}

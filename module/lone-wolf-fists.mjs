@@ -158,15 +158,27 @@ Hooks.on('chatMessage', (_, messageText, data) => {
   }
 })
 
-// Dashed outline of sets when clicked
-Hooks.on('renderChatLog', (_app, html) => {
-  const chatLog = html instanceof HTMLElement ? html : html?.[0];
-  chatLog?.addEventListener('click', (ev) => {
+// Dashed outline of effort dice sets when clicked.
+Hooks.once('ready', () => {
+  const toggleDiceSet = (targetDiv) => {
+    targetDiv.classList.toggle('selected-set');
+    targetDiv.setAttribute('aria-pressed', targetDiv.classList.contains('selected-set').toString());
+  };
+
+  document.body.addEventListener('click', (ev) => {
     const targetDiv = ev.target.closest?.('.dice-set');
     if (!targetDiv) return;
-    targetDiv.classList.toggle('selected-set');
+    toggleDiceSet(targetDiv);
   });
-})
+
+  document.body.addEventListener('keydown', (ev) => {
+    if (ev.key !== 'Enter' && ev.key !== ' ') return;
+    const targetDiv = ev.target.closest?.('.dice-set');
+    if (!targetDiv) return;
+    ev.preventDefault();
+    toggleDiceSet(targetDiv);
+  });
+});
 
 
 /* -------------------------------------------- */

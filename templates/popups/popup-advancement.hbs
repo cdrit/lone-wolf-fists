@@ -1,0 +1,12 @@
+<form class="lwf-popup-form">
+  <p>Record permanent character advancements that add to archetype-derived stats.</p>
+  <div class="form-group">
+    <label for="advancement-effort">Effort bonus</label>
+    <input id="advancement-effort" type="number" name="effort" value="{{advancement.effort}}" min="0" step="1" data-dtype="Number">
+  </div>
+  <div class="form-group">
+    <label for="advancement-health">Health bonus levels</label>
+    <input id="advancement-health" type="number" name="health" value="{{advancement.health}}" min="0" step="1" data-dtype="Number">
+    <p class="hint">Each health bonus level adds 10 to maximum Health.</p>
+  </div>
+</form>

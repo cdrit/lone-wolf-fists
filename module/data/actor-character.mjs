@@ -34,6 +34,10 @@ export class lwfCharacter extends lwfActorChakras {
     schema.effortless = new SchemaField({
       lvl: new NumberField({ ...requiredInteger, initial: 0 })
     });
+    schema.advancement = new SchemaField({
+      effort: new NumberField({ ...requiredInteger, initial: 0, min: 0 }),
+      health: new NumberField({ ...requiredInteger, initial: 0, min: 0 })
+    });
     schema.foci = new SchemaField({
       lvl: new NumberField({ ...requiredInteger, initial: 0 }),
       // Visibility of focus slots is controlled at the character sheet level
@@ -104,13 +108,14 @@ export class lwfCharacter extends lwfActorChakras {
       this.chakras.value = this.chakras.lvl;
 
 
+    this.power.bonus = this.advancement.effort;
     if(optionalRuleEnabled){
       this.optImbalances.enabled = true;
       this.optImbalances.effortBoost = this.optImbalances.level;
       if (this.optImbalances.effortBoost > this.degree.lvl){
         this.optImbalances.effortBoost = this.degree.lvl;
       }
-      this.power.bonus = this.optImbalances.effortBoost;
+      this.power.bonus += this.optImbalances.effortBoost;
 
       this.optImbalances.pranaBoost = this.optImbalances.level * this.pool.lvl;
       const maxBoost = this.pool.lvl * this.degree.lvl;
@@ -121,7 +126,7 @@ export class lwfCharacter extends lwfActorChakras {
     }
     this.power.final = this.power.lvl + this.power.bonus;
     // calculate max health and aura from health and aura levels respectively
-    this.health.max = this.health.lvl * 10;
+    this.health.max = (this.health.lvl + this.advancement.health) * 10;
     if(this.health.max < this.health.value)
       this.health.value = this.health.max;
     this.aura.max = this.aura.lvl * 10;

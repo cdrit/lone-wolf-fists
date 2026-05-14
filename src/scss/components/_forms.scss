@@ -491,3 +491,41 @@ h4 {
 .section-header {
   margin: 0 0 3px 0;
 }
+
+.edit-mode-button,
+.sheet-control-button {
+  align-items: center;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 4px;
+  justify-content: center;
+  min-height: 28px;
+  min-width: 76px;
+  padding: 4px 10px;
+  white-space: nowrap;
+
+  &:hover,
+  &:focus {
+    text-shadow: 0 0 10px #ff0000;
+  }
+}
+
+.character-action-buttons {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.advancement-bonus {
+  flex: 1 0 100%;
+  font-size: 10px;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.choose-archetype {
+  gap: 8px;
+  margin: 20px;
+}

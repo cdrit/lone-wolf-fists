@@ -1,0 +1,12 @@
+<form class="lwf-popup-form">
+  <p>Choose the archetype for this character.</p>
+  <div class="popup-choice-list">
+    {{#each archetypes}}
+    <label class="popup-choice">
+      <input type="radio" name="archetype" value="{{this._id}}" {{#if (comparison ../current this.name)}}checked{{/if}}>
+      <img src="{{this.img}}" width="32" height="32" alt="">
+      <span>{{this.name}}</span>
+    </label>
+    {{/each}}
+  </div>
+</form>

@@ -51,6 +51,30 @@
   margin: 0 3px;
 }
 
+.lwf-popup-form .form-group,
+.lwf-popup-form .popup-choice {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.lwf-popup-form .popup-choice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lwf-popup-form .popup-choice {
+  cursor: pointer;
+}
+
+.lwf-popup-form .hint {
+  flex-basis: 100%;
+  font-size: 12px;
+  margin: 0 0 0 24px;
+}
+
 .grid,
 .grid-2col {
   display: grid;
@@ -347,14 +371,27 @@
   cursor: pointer;
 }
 
-.selected-set {
-  outline-style: solid;
-}
-
 .dice-image {
   border: none;
   height: 30px;
   width: 30px;
+}
+
+.dice-set {
+  border-radius: 4px;
+  padding: 2px;
+}
+
+.dice-set:focus-visible {
+  outline: 2px solid #ffcc00;
+  outline-offset: 2px;
+}
+
+.selected-set {
+  background: rgba(255, 204, 0, 0.18);
+  outline: 3px dashed #ffcc00;
+  outline-offset: 2px;
+  opacity: 0.7;
 }
 
 /* Styles limited to lone-wolf-fists sheets */
@@ -759,6 +796,40 @@
 }
 .lone-wolf-fists .section-header {
   margin: 0 0 3px 0;
+}
+.lone-wolf-fists .edit-mode-button,
+.lone-wolf-fists .sheet-control-button {
+  align-items: center;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 4px;
+  justify-content: center;
+  min-height: 28px;
+  min-width: 76px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+.lone-wolf-fists .edit-mode-button:hover, .lone-wolf-fists .edit-mode-button:focus,
+.lone-wolf-fists .sheet-control-button:hover,
+.lone-wolf-fists .sheet-control-button:focus {
+  text-shadow: 0 0 10px #ff0000;
+}
+.lone-wolf-fists .character-action-buttons {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+.lone-wolf-fists .advancement-bonus {
+  flex: 1 0 100%;
+  font-size: 10px;
+  line-height: 1.1;
+  text-align: center;
+}
+.lone-wolf-fists .choose-archetype {
+  gap: 8px;
+  margin: 20px;
 }
 .lone-wolf-fists rce-label {
   font-weight: bold;
