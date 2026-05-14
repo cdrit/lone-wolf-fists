@@ -19,7 +19,7 @@
         <div class="grid grid-2col">
           <div id="effort" class="resource flex-group-center flex-column">
             <label for="system.power.lvl" class="resource-label">Effort</label>
-            <div id="effort-display" class="flex-group-center flex">
+            <div id="effort-display" class="flex-group-center flex" data-action="rollEffort">
               <h4><strong>{{system.power.final}}</strong></h4>
             </div>
           </div>
@@ -50,7 +50,7 @@
             </div>
           </div>
           <div class="rest-container flex flex-group-center">
-            <div id="rest-button" class=" flex-group-center flexshrink" title="Rest and recover health">
+            <div id="rest-button" class=" flex-group-center flexshrink" title="Rest and recover health" data-action="rest">
             </div>
           </div>
           <div class="flex-4 resource flex-group-center inner-margin">
@@ -100,7 +100,7 @@
         </div>
       </div>
       {{#if skill.missing}}
-      <button type="submit" id="newMasteries" data-missing="{{skill.difference}}">Choose your masteries</button>
+      <button type="submit" id="newMasteries" data-missing="{{skill.difference}}" data-action="chooseMasteries">Choose your masteries</button>
       {{/if}}
     </div>
   </header>
@@ -193,8 +193,7 @@
         <div class='item-image'>
             <a
               class='item-control item-edit'
-              title='{{localize "DOCUMENT.Update" type='Item'}}'
-            >
+              title='{{localize "DOCUMENT.Update" type='Item'}}' data-action="editItem">
             <img
               class="mastery-image"
               src='{{skill.img}}'
@@ -212,8 +211,7 @@
         <div class='item-image'>
             <a
               class='item-control item-edit'
-              title='{{localize "DOCUMENT.Update" type='Item'}}'
-            >
+              title='{{localize "DOCUMENT.Update" type='Item'}}' data-action="editItem">
             <img
               class="skill-image"
               src='{{skill.img}}'

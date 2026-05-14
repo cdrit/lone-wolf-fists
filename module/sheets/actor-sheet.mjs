@@ -34,6 +34,25 @@ export class lwfActorSheet extends LWFActorSheetBase {
         return this._onSubmit(event, form, formData);
       },
     },
+    actions: {
+      create: function(event, target) { return this._onEffectControl(event, target); },
+      toggle: function(event, target) { return this._onEffectControl(event, target); },
+      edit: function(event, target) { return this._onEffectControl(event, target); },
+      delete: function(event, target) { return this._onEffectControl(event, target); },
+      createItem: function(event, target) { return this._onItemCreate(event, target); },
+      deleteItem: function(event, target) { return this._onItemDelete(event, target); },
+      editItem: function(event, target) { return this._onItemEdit(event, target); },
+      chooseMasteries: function(event, target) { return this._onChooseMasteries(event, target); },
+      recoverPrana: function(event, target) { return this._onRecoverPrana(event, target); },
+      decreaseChakra: function(event, target) { return this._onDecreaseChakra(event, target); },
+      increaseChakra: function(event, target) { return this._onIncreaseChakra(event, target); },
+      pranaFlare: function(event, target) { return this._onPranaFlare(event, target); },
+      toggleChakra: function(event, target) { return this._onToggleChakra(event, target); },
+      rest: function(event, target) { return this._onRest(event, target); },
+      roll: function(event, target) { return this._onRoll(event, target); },
+      rollEffort: function(event, target) { return this._onEffortRoll(event, target); },
+      toggleEditMode: function(event, target) { return this._onToggleEditMode(event, target); },
+    },
   };
 
   static PARTS = {
@@ -523,32 +542,200 @@ export class lwfActorSheet extends LWFActorSheetBase {
     return this.document.update(updateData);
   }
 
+  _getActionTarget(event, target) {
+    return target ?? event.currentTarget;
+  }
+
+  _isEditableAction(event) {
+    event.preventDefault();
+    return this.isEditable;
+  }
+
+  _onItemEdit(event, target) {
+    event.preventDefault();
+    const li = $(this._getActionTarget(event, target)).parents('.item');
+    const item = this.actor.items.get(li.data('itemId'));
+    item.sheet.render(true);
+  }
+
+  _onEffortRoll(event, target) {
+    event.preventDefault();
+    const element = this._getActionTarget(event, target);
+    let data = {"speaker": { "actor": this.actor._id }};
+    if(this.token?._id){
+      data = {"speaker": {
+        "alias": this.token.name,
+        "scene": this.token.parent._id,
+        "token": this.token._id,
+      }};
+    }
+    const diceNumber = Number.parseInt(element.outerText);
+    effortRoll(diceNumber, data)
+  }
+
+  async _onRest(event) {
+    if (!this._isEditableAction(event)) return;
+
+    const restHTML = await foundry.applications.handlebars.renderTemplate('systems/lone-wolf-fists/templates/popups/popup-rest.hbs');
+    const restData = await foundry.applications.api.DialogV2.wait({
+      window: { title: "How long would you like to rest?" },
+      content: restHTML,
+      buttons: [{
+        action: "submit",
+        label: "Rest",
+        default: true,
+        callback: (event, button) => {
+          const formData = new FormDataExtended(button.form);
+          return formData.object;
+        }
+      }]
+    });
+
+    if(!restData) return;
+
+    if(restData["full-rest"] === "true"){
+      this.actor.update({[ `system.health.value` ]: this.actor.system.health.max
+       })
+      return;
+    }
+    else {
+      if(isNaN(parseInt(restData["hours-rested"]))){
+        const errorHtml = "<div>Hours rested must be a whole number</div>";
+        ui.notifications.error(errorHtml);
+        return;
+      }
+      const rolls = await new Roll(`${restData["hours-rested"]}d10`).evaluate();
+      const newHealth = rolls._total + this.actor.system.health.value;
+      this.actor.update({[ `system.health.value` ]: newHealth})
+    }
+  }
+
+  _onRecoverPrana(event) {
+    if (!this._isEditableAction(event)) return;
+    chakraReset(this.actor);
+  }
+
+  _onToggleChakra(event, target) {
+    if (!this._isEditableAction(event)) return;
+    const element = this._getActionTarget(event, target);
+    // Find the chakra type
+    let chakra = element.parentElement.dataset.imbtype;
+
+    // Find the current value of the chakra
+    const awakened = this.actor.system.chakras.awakened;
+    let update = !(awakened[chakra]);
+
+    // Update the actor with the inverted value
+    this.actor.update({[ `system.chakras.awakened.${chakra}` ]: update})
+
+  }
+
+  _onIncreaseChakra(event) {
+    if (!this._isEditableAction(event)) return;
+    let newActive = this.actor.system.chakras.value + 1;
+    this.actor.update({['system.chakras.value']: newActive})
+  }
+
+  _onDecreaseChakra(event) {
+    if (!this._isEditableAction(event)) return;
+    let newActive = this.actor.system.chakras.value - 1;
+    this.actor.update({['system.chakras.value']: newActive});
+  }
+
+  _onPranaFlare(event) {
+    if (!this._isEditableAction(event)) return;
+    const artifacts = this.actor.items.filter(i => i.type === "artifact")
+    let extraPrana = 0;
+    if(artifacts.length > 0){
+      for (const artifact of artifacts){
+        if(!artifact.system.chakra.hasChakra ||
+          artifact.system.chakra.recovery <= 0 ||
+          (!artifact.system.worn && !artifact.system.held)){
+          continue
+        }
+        extraPrana += artifact.system.chakra.recovery;
+      }
+    }
+    let newActive = this.actor.system.chakras.value + 1;
+    let increase = this.actor.system.pool.recovery * newActive;
+    increase = increase + this.actor.system.prana.value + extraPrana;
+    this.actor.update({['system.chakras.value']: newActive, ['system.prana.value']: increase});
+  }
+
+  async _onChooseMasteries(event, target) {
+    if (!this._isEditableAction(event)) return;
+    const element = this._getActionTarget(event, target);
+    const names = [];
+    for (let i in LWFSKILLS){
+      if(this.actor.system.masteries.types[LWFSKILLS[i]] !== true){
+        let newName = LWFSKILLS[i].concat(" Mastery");
+        names.push(newName);
+      }
+    }
+    const pack = game.packs.get("lone-wolf-fists.masteries").index;
+    const missing = pack.filter(({name}) => names.includes(name));
+    const difference = parseInt(element.dataset.missing);
+    const masteries = {"missing": missing, "difference": difference};
+    const masteryHTML = await foundry.applications.handlebars.renderTemplate('systems/lone-wolf-fists/templates/popups/popup-masteries.hbs', masteries)
+    const choices = await foundry.applications.api.DialogV2.wait({
+      window: { title: "Choose your mastery" },
+      content: masteryHTML,
+      buttons: [{
+        action: "submit",
+        label: "Master",
+        default: true,
+        callback: (event, button) => {
+          const formData = new FormDataExtended(button.form);
+          return formData.object;
+        }
+      }]
+    });
+    if(!choices) return;
+
+    let items = this.actor.items.map(i => i.toObject());
+    for(let i in choices){
+      if (choices[i] !== null){
+        let obj = await game.packs.get('lone-wolf-fists.masteries').getDocument(choices[i]);
+        items.push(obj.toObject());
+      }
+    }
+    this.actor.update({ items });
+  }
+
+  _onToggleEditMode(event) {
+    if (!this._isEditableAction(event)) return;
+    const editMode = !this.actor.system.editMode
+    this.actor.update({[ 'system.editMode' ]: editMode})
+  }
+
+  _onEffectControl(event, target) {
+    if (!this._isEditableAction(event)) return;
+    const control = this._getActionTarget(event, target);
+    const row = control.closest('li');
+    const document =
+      row.dataset.parentId === this.actor.id
+        ? this.actor
+        : this.actor.items.get(row.dataset.parentId);
+    const effectEvent = Object.create(event);
+    Object.defineProperty(effectEvent, 'currentTarget', { value: control });
+    onManageActiveEffect(effectEvent, document);
+  }
+
+  _onItemDelete(event, target) {
+    if (!this._isEditableAction(event)) return;
+    const tr = $(this._getActionTarget(event, target)).parents('.item');
+    const item = this.actor.items.get(tr.data('itemId'));
+    item.delete();
+    tr.slideUp(200, () => this.render(false));
+  }
+
   /** @override */
   activateListeners(html) {
 
-    // Render the item sheet for viewing/editing prior to the editable check.
-    html.on('click', '.item-edit', (ev) => {
-      const li = $(ev.currentTarget).parents('.item');
-      const item = this.actor.items.get(li.data('itemId'));
-      item.sheet.render(true);
-    });
 
     // -------------------------------------------------------------
     // Everything below here is only needed if the sheet is editable
 
-    // Roll effort when effort clicked
-    html.on('click', '#effort #effort-display', (ev) => {
-      let data = {"speaker": { "actor": this.actor._id }};
-      if(this.token?._id){
-        data = {"speaker": { 
-          "alias": this.token.name,
-          "scene": this.token.parent._id,
-          "token": this.token._id,
-        }};
-      }
-      const diceNumber = Number.parseInt(ev.currentTarget.outerText);
-      effortRoll(diceNumber, data)
-    });
 
     if (!this.isEditable) return;
 
@@ -577,138 +764,18 @@ export class lwfActorSheet extends LWFActorSheetBase {
         item.update({ [`system.${target}`]: update});
     })
 
-    html.on('click', '#rest-button', async () => {
-      const restHTML = await foundry.applications.handlebars.renderTemplate('systems/lone-wolf-fists/templates/popups/popup-rest.hbs');
-      const restData = await foundry.applications.api.DialogV2.wait({
-        window: { title: "How long would you like to rest?" },
-        content: restHTML,
-        buttons: [{
-          action: "submit",
-          label: "Rest",
-          default: true,
-          callback: (event, button) => {
-            const formData = new FormDataExtended(button.form);
-            return formData.object;
-          }
-        }]
-      });
 
-      if(!restData) return;
 
-      if(restData["full-rest"] === "true"){
-        this.actor.update({[ `system.health.value` ]: this.actor.system.health.max
-         })
-        return;
-      }
-      else {
-        if(isNaN(parseInt(restData["hours-rested"]))){
-          const errorHtml = "<div>Hours rested must be a whole number</div>";
-          ui.notifications.error(errorHtml);
-          return;
-        }
-        const rolls = await new Roll(`${restData["hours-rested"]}d10`).evaluate();
-        const newHealth = rolls._total + this.actor.system.health.value;
-        this.actor.update({[ `system.health.value` ]: newHealth})
-      }
-    });
 
-    html.on('click', '#recover-prana', async (ev) => {
-      chakraReset(this.actor);
-    });
 
-    // Choose masteries to add on level up TODO: pass the data back to the original character sheet
-    html.on('click', '#newMasteries', async (ev) => {
-      const names = [];
-      for (let i in LWFSKILLS){
-        if(this.actor.system.masteries.types[LWFSKILLS[i]] !== true){
-          let newName = LWFSKILLS[i].concat(" Mastery");
-          names.push(newName);
-        }
-      }
-      const pack = game.packs.get("lone-wolf-fists.masteries").index;
-      const missing = pack.filter(({name}) => names.includes(name));
-      const difference = parseInt(ev.currentTarget.dataset.missing);
-      const masteries = {"missing": missing, "difference": difference};
-      const masteryHTML = await foundry.applications.handlebars.renderTemplate('systems/lone-wolf-fists/templates/popups/popup-masteries.hbs', masteries)
-      const choices = await foundry.applications.api.DialogV2.wait({
-        window: { title: "Choose your mastery" },
-        content: masteryHTML,
-        buttons: [{
-          action: "submit",
-          label: "Master",
-          default: true,
-          callback: (event, button) => {
-            const formData = new FormDataExtended(button.form);
-            return formData.object;
-          }
-        }]
-      });
-      if(!choices) return;
 
-      let items = this.actor.items.map(i => i.toObject());
-      for(let i in choices){
-        if (choices[i] !== null){
-          let obj = await game.packs.get('lone-wolf-fists.masteries').getDocument(choices[i]);
-          items.push(obj.toObject());
-        }
-      }
-      this.actor.update({ items });
-    })
 
-    html.on('click', '.chakra-image',  (ev) => {
-      // Find the chakra type
-      let chakra = ev.currentTarget.parentElement.dataset.imbtype;
-
-      // Find the current value of the chakra
-      const awakened = this.actor.system.chakras.awakened;
-      let update = !(awakened[chakra]);
-     
-      // Update the actor with the inverted value
-      this.actor.update({[ `system.chakras.awakened.${chakra}` ]: update})
-
-    })
-
-    // Increase number of active chakras
-    html.on('click', '.chakra-increase', async () => {
-      let newActive = this.actor.system.chakras.value + 1;
-      this.actor.update({['system.chakras.value']: newActive})
-    })
-
-    // decrease number of active chakras
-    html.on('click', '.chakra-decrease', async () => {
-      let newActive = this.actor.system.chakras.value - 1;
-      this.actor.update({['system.chakras.value']: newActive});
-    })
-
-    // Prana flare when click the prana flare button
-    html.on('click', '#prana-flare', async () => {
-      const artifacts = this.actor.items.filter(i => i.type === "artifact")
-      let extraPrana = 0;
-      if(artifacts.length > 0){
-        for (const artifact of artifacts){
-          if(!artifact.system.chakra.hasChakra || 
-            artifact.system.chakra.recovery <= 0 ||
-            (!artifact.system.worn && !artifact.system.held)){
-            continue
-          }
-          extraPrana += artifact.system.chakra.recovery;
-        }
-      }
-      let newActive = this.actor.system.chakras.value + 1;
-      let increase = this.actor.system.pool.recovery * newActive;
-      increase = increase + this.actor.system.prana.value + extraPrana;
-      this.actor.update({['system.chakras.value']: newActive, ['system.prana.value']: increase});
-    })
 
     html.on('change', '.techniqueDisplay', (ev) => {
       let update = $(ev.currentTarget)[0].value;
       this.actor.update({[ 'system.techTableFocus' ]: update});
     })
 
-    html.on('click', '#edit-mode', (ev) => {
-      const editMode = !this.actor.system.editMode
-      this.actor.update({[ 'system.editMode' ]: editMode})
-    })
 
     // Add squad member
     html.on('click', '.member-create', (ev) => {
@@ -797,29 +864,9 @@ export class lwfActorSheet extends LWFActorSheetBase {
         return await anatomy.update({[ `system.${target}` ]: newValue })
     })
 
-    // Add Inventory Item
-    html.on('click', '.item-create', this._onItemCreate.bind(this));
 
-    // Delete Inventory Item
-    html.on('click', '.item-delete', (ev) => {
-      const tr = $(ev.currentTarget).parents('.item');
-      const item = this.actor.items.get(tr.data('itemId'));
-      item.delete();
-      tr.slideUp(200, () => this.render(false));
-    });
 
-    // Active Effect management
-    html.on('click', '.effect-control', (ev) => {
-      const row = ev.currentTarget.closest('li');
-      const document =
-        row.dataset.parentId === this.actor.id
-          ? this.actor
-          : this.actor.items.get(row.dataset.parentId);
-      onManageActiveEffect(ev, document);
-    });
 
-    // Rollable abilities.
-    html.on('click', '.rollable', this._onRoll.bind(this));
 
     // Drag events for macros.
     if (this.actor.isOwner) {
@@ -837,9 +884,9 @@ export class lwfActorSheet extends LWFActorSheetBase {
    * @param {Event} event   The originating click event
    * @private
    */
-  async _onItemCreate(event) {
+  async _onItemCreate(event, target) {
     event.preventDefault();
-    const header = event.currentTarget;
+    const header = this._getActionTarget(event, target);
     // Get the type of item to create.
     const type = header.dataset.type;
     // Grab any data associated with this control.
@@ -854,6 +901,7 @@ export class lwfActorSheet extends LWFActorSheetBase {
     };
     // Remove the type from the dataset since it's in the itemData.type prop.
     delete itemData.system['type'];
+    delete itemData.system['action'];
 
     // Finally, create the item!
     return await Item.create(itemData, { parent: this.actor });
@@ -864,9 +912,9 @@ export class lwfActorSheet extends LWFActorSheetBase {
    * @param {Event} event   The originating click event
    * @private
    */
-  _onRoll(event) {
+  _onRoll(event, target) {
     event.preventDefault();
-    const element = event.currentTarget;
+    const element = this._getActionTarget(event, target);
     const dataset = element.dataset;
 
     // Handle item rolls.

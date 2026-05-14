@@ -28,7 +28,7 @@
       </div>
       <div id="effort" class="resource flex-group-center flex-column npc-sidebar">
         <label for="power-input" class="resource-label">Effort</label>
-        <div id="effort-display" class="flex-group-center flex">
+        <div id="effort-display" class="flex-group-center flex" data-action="rollEffort">
           <h4 id="power-input"><strong>{{system.power.lvl}}</strong></h4>
         </div>
       </div>
@@ -70,7 +70,7 @@
         {{#if isGM}}
         <div class="full-size edit-container">
         {{#unless system.editMode}}
-        <i id="edit-mode" class="fa-solid fa-gear edit-mode-off">Edit</i>
+        <i id="edit-mode" class="fa-solid fa-gear edit-mode-off" data-action="toggleEditMode">Edit</i>
         {{/unless}}
         </div>
         {{/if}}
@@ -81,7 +81,7 @@
     <div class="flex flex-column flex-group-center" >
       <h2>Set Initial Numbers</h2>
       <h3><input id="membership-set" class="stat-current medium-box" type="text" name="membership-max" value="{{system.membership.max}}" data-dtype="Number"/></h3>
-      <button id="edit-mode" class="medium-box">Set</button>
+      <button id="edit-mode" class="medium-box" data-action="toggleEditMode">Set</button>
     </div>
     {{else}}
     {{!-- Sheet Tab Navigation --}}

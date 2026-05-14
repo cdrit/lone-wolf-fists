@@ -32,6 +32,13 @@ export class lwfItemSheet extends LWFItemSheetBase {
         return this._onSubmit(event, form, formData);
       },
     },
+    actions: {
+      create: function(event, target) { return this._onEffectControl(event, target); },
+      toggle: function(event, target) { return this._onEffectControl(event, target); },
+      edit: function(event, target) { return this._onEffectControl(event, target); },
+      delete: function(event, target) { return this._onEffectControl(event, target); },
+      toggleEditMode: function(event, target) { return this._onToggleEditMode(event, target); },
+    },
   };
 
   static PARTS = {
@@ -170,6 +177,28 @@ export class lwfItemSheet extends LWFItemSheetBase {
 
   /* -------------------------------------------- */
 
+  _getActionTarget(event, target) {
+    return target ?? event.currentTarget;
+  }
+
+  _isEditableAction(event) {
+    event.preventDefault();
+    return this.isEditable;
+  }
+
+  _onEffectControl(event, target) {
+    if (!this._isEditableAction(event)) return;
+    const effectEvent = Object.create(event);
+    Object.defineProperty(effectEvent, 'currentTarget', { value: this._getActionTarget(event, target) });
+    onManageActiveEffect(effectEvent, this.item);
+  }
+
+  _onToggleEditMode(event) {
+    if (!this._isEditableAction(event)) return;
+    const editMode = !this.item.system.editMode
+    this.item.update({[ 'system.editMode' ]: editMode})
+  }
+
   /** @override */
   activateListeners(html) {
 
@@ -178,10 +207,6 @@ export class lwfItemSheet extends LWFItemSheetBase {
 
     // Roll handlers, click handlers, etc. would go here.
 
-    // Active Effect management
-    html.on('click', '.effect-control', (ev) =>
-      onManageActiveEffect(ev, this.item)
-    );
 
     // Change imbalance data when the data is altered on the sheet
     html.on('change', '.item-choice', async (ev) =>{      
@@ -203,10 +228,6 @@ export class lwfItemSheet extends LWFItemSheetBase {
       await item.update({ [`system.${target}`]: update});
     });
 
-    html.on('click', '#edit-mode', (ev) => {
-      const editMode = !this.item.system.editMode
-      this.item.update({[ 'system.editMode' ]: editMode})
-    })
 
     // Leaving this here as an example of creating an active effect
     /*html.on('change', '#armorValue', async (ev) => {

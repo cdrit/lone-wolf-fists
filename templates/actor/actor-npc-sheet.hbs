@@ -30,7 +30,7 @@
         {{#if system.editMode}}
         <input id="power-input" class="smallish-box short-box" type="text" name="system.power.lvl" value="{{system.power.lvl}}" data-dtype="Number">
         {{else}}
-        <div id="effort-display" class="flex-group-center flex">
+        <div id="effort-display" class="flex-group-center flex" data-action="rollEffort">
           <h4 id="power-input"><strong>{{system.power.lvl}}</strong></h4>
         </div>
         {{/if}}
@@ -120,9 +120,9 @@
       {{#if isGM}}
       <div class="full-size edit-container">
       {{#if system.editMode}}
-      <i id="edit-mode" class="fa-solid fa-gear edit-mode-on">Play</i>
+      <i id="edit-mode" class="fa-solid fa-gear edit-mode-on" data-action="toggleEditMode">Play</i>
       {{else}}
-      <i id="edit-mode" class="fa-solid fa-gear edit-mode-off">Edit</i>
+      <i id="edit-mode" class="fa-solid fa-gear edit-mode-off" data-action="toggleEditMode">Edit</i>
       {{/if}}
       </div>
       {{/if}}
