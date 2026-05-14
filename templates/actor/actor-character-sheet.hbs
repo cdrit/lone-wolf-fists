@@ -22,6 +22,9 @@
             <div id="effort-display" class="flex-group-center flex" data-action="rollEffort">
               <h4><strong>{{system.power.final}}</strong></h4>
             </div>
+            {{#if system.advancement.effort}}
+            <small class="advancement-bonus">+{{system.advancement.effort}} advancement</small>
+            {{/if}}
           </div>
           <div id="effortless" class="resource flex-group-center">
             <label for="system.effortless.lvl" class="resource-label">E-less</label>
@@ -46,6 +49,9 @@
               <div id="health" class="resource-content max-min flexrow flex-group-center">
                 <input class="health-current stat-current" type="text" name="system.health.value" value="{{system.health.value}}" data-dtype="Number"/>
                 <input class="health-max stat-max" type="text" name="system.health.max" value="{{system.health.max}}" readonly disabled data-dtype="Number"/>
+                {{#if system.advancement.health}}
+                <small class="advancement-bonus">+{{system.advancement.health}} health {{#if (comparison system.advancement.health 1)}}level{{else}}levels{{/if}}</small>
+                {{/if}}
               </div>
             </div>
           </div>
@@ -99,9 +105,12 @@
           {{/each}}
         </div>
       </div>
-      {{#if skill.missing}}
-      <button type="submit" id="newMasteries" data-missing="{{skill.difference}}" data-action="chooseMasteries">Choose your masteries</button>
-      {{/if}}
+      <div class="character-action-buttons">
+        <button type="button" class="sheet-control-button" data-action="configureAdvancement">Advancement</button>
+        {{#if skill.missing}}
+        <button type="button" id="newMasteries" class="sheet-control-button" data-missing="{{skill.difference}}" data-action="chooseMasteries">Choose your masteries</button>
+        {{/if}}
+      </div>
     </div>
   </header>
   {{! If the player does not have enough masteries, prompt them to add more}}
@@ -109,9 +118,10 @@
 
   {{! if no archetype has been chosen yet, prompt the player to choose one}}
   {{#if (comparison system.archetype "")}}
-  <section>
-    <h1 class="flex-group-centre">Choose an archetype</h1>
-  
+  <section class="choose-archetype flex-column flex-group-center">
+    <h1>Choose an archetype</h1>
+    <p>Select the character archetype that sets your starting stats.</p>
+    <button type="button" class="sheet-control-button" data-action="chooseArchetype">Choose Archetype</button>
   </section>
   {{else}}
   {{!-- Sheet Tab Navigation --}}

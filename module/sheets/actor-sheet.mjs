@@ -15,6 +15,7 @@ import { LWFDOMAINS } from '../helpers/domains.mjs';
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
+const { FormDataExtended } = foundry.applications.ux;
 
 const LWFActorSheetBase = HandlebarsApplicationMixin(ActorSheetV2);
 
@@ -43,6 +44,8 @@ export class lwfActorSheet extends LWFActorSheetBase {
       deleteItem: function(event, target) { return this._onItemDelete(event, target); },
       editItem: function(event, target) { return this._onItemEdit(event, target); },
       chooseMasteries: function(event, target) { return this._onChooseMasteries(event, target); },
+      chooseArchetype: function(event, target) { return this._onChooseArchetype(event, target); },
+      configureAdvancement: function(event, target) { return this._onConfigureAdvancement(event, target); },
       recoverPrana: function(event, target) { return this._onRecoverPrana(event, target); },
       decreaseChakra: function(event, target) { return this._onDecreaseChakra(event, target); },
       increaseChakra: function(event, target) { return this._onIncreaseChakra(event, target); },
@@ -59,7 +62,32 @@ export class lwfActorSheet extends LWFActorSheetBase {
     form: { template: '' },
   };
 
+  static TABS = {
+    primary: {
+      initial: 'core',
+      tabs: [
+        { id: 'core' },
+        { id: 'imbalances' },
+        { id: 'items' },
+        { id: 'followers' },
+        { id: 'dharma' },
+        { id: 'bio' },
+        { id: 'description' },
+        { id: 'effects' },
+        { id: 'config' },
+        { id: 'onslaught' },
+        { id: 'military' },
+        { id: 'subjects' }
+      ]
+    }
+  };
+
   tabGroups = { primary: 'core' };
+
+  /** @override */
+  get title() {
+    return this.actor.name;
+  }
 
   /** @override */
   get template() {
@@ -670,8 +698,9 @@ export class lwfActorSheet extends LWFActorSheetBase {
         names.push(newName);
       }
     }
-    const pack = game.packs.get("lone-wolf-fists.masteries").index;
-    const missing = pack.filter(({name}) => names.includes(name));
+    const pack = game.packs.get("lone-wolf-fists.masteries");
+    const index = await pack.getIndex();
+    const missing = Array.from(index).filter(({name}) => names.includes(name));
     const difference = parseInt(element.dataset.missing);
     const masteries = {"missing": missing, "difference": difference};
     const masteryHTML = await foundry.applications.handlebars.renderTemplate('systems/lone-wolf-fists/templates/popups/popup-masteries.hbs', masteries)
@@ -698,6 +727,73 @@ export class lwfActorSheet extends LWFActorSheetBase {
       }
     }
     this.actor.update({ items });
+  }
+
+
+  async _onChooseArchetype(event) {
+    if (!this._isEditableAction(event)) return;
+    const pack = game.packs.get('lone-wolf-fists.archetypes');
+    if (!pack) {
+      ui.notifications.error('Could not find the Archetypes compendium.');
+      return;
+    }
+
+    const archetypes = Array.from(await pack.getIndex()).sort((a, b) => a.name.localeCompare(b.name));
+    const archetypeHTML = await foundry.applications.handlebars.renderTemplate(
+      'systems/lone-wolf-fists/templates/popups/popup-archetype.hbs',
+      { archetypes, current: this.actor.system.archetype }
+    );
+    const choice = await foundry.applications.api.DialogV2.wait({
+      window: { title: 'Choose your archetype' },
+      content: archetypeHTML,
+      buttons: [{
+        action: 'submit',
+        label: 'Choose',
+        default: true,
+        callback: (event, button) => {
+          const formData = new FormDataExtended(button.form);
+          return formData.object;
+        }
+      }]
+    });
+    if (!choice?.archetype) return;
+
+    const archetype = await pack.getDocument(choice.archetype);
+    const items = this.actor.items.filter(i => i.type !== 'archetype').map(i => i.toObject());
+    items.push(archetype.toObject());
+    return this.actor.update({
+      'system.archetype': archetype.system.archetype || archetype.name,
+      items
+    });
+  }
+
+  async _onConfigureAdvancement(event) {
+    if (!this._isEditableAction(event)) return;
+    if (this.actor.type !== 'character') return;
+
+    const advancementHTML = await foundry.applications.handlebars.renderTemplate(
+      'systems/lone-wolf-fists/templates/popups/popup-advancement.hbs',
+      { advancement: this.actor.system.advancement }
+    );
+    const advancement = await foundry.applications.api.DialogV2.wait({
+      window: { title: 'Character advancement' },
+      content: advancementHTML,
+      buttons: [{
+        action: 'submit',
+        label: 'Save',
+        default: true,
+        callback: (event, button) => {
+          const formData = new FormDataExtended(button.form);
+          return formData.object;
+        }
+      }]
+    });
+    if (!advancement) return;
+
+    return this.actor.update({
+      'system.advancement.effort': Number(advancement.effort) || 0,
+      'system.advancement.health': Number(advancement.health) || 0
+    });
   }
 
   _onToggleEditMode(event) {

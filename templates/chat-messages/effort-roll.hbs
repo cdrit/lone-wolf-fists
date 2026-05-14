@@ -1,6 +1,6 @@
 <div>
     {{#each sets}}
-    <div id="dice-set-{{this}}" class="inline-grid dice-set" data-facing="{{this}}">
+    <div id="dice-set-{{this}}" class="inline-grid dice-set" data-facing="{{this}}" role="button" aria-pressed="false" tabindex="0" title="Click to mark this set as used">
         {{#each this}}
         <div class="individual-dice">
             <img class="dice-image" src="systems/lone-wolf-fists/assets/dice/d10-{{this}}.png" title="d10-{{this}}" height="40" width="40">

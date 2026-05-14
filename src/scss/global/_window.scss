@@ -59,3 +59,29 @@
   width: 400px;
   margin: 0 3px;
 }
+
+.lwf-popup-form {
+  .form-group,
+  .popup-choice {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .popup-choice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .popup-choice {
+    cursor: pointer;
+  }
+
+  .hint {
+    flex-basis: 100%;
+    font-size: 12px;
+    margin: 0 0 0 24px;
+  }
+}
