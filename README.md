@@ -2,7 +2,7 @@
 
 ![Foundry v14](https://img.shields.io/badge/foundry-v14-green)
 
-This is a system to play the post-apocalyptic anime inspired ttrpg [Lone Wolf Fists](https://www.drivethrurpg.com/en/product/416442/tian-shang-lone-wolf-fists-core-rulebook) using Foundry VTT version 12+. It has been built starting from the [Boilerplate system](https://github.com/asacolips-projects/boilerplate), and I consider it currently feature complete.
+This is a system to play the post-apocalyptic anime inspired TTRPG [Lone Wolf Fists](https://www.drivethrurpg.com/en/product/416442/tian-shang-lone-wolf-fists-core-rulebook) using Foundry VTT version 14+. It has been built starting from the [Boilerplate system](https://github.com/asacolips-projects/boilerplate), and I consider it currently feature complete.
 
 ## Features
 - Character sheets for player characters, npcs/monsters, titans/disasters, vehicles, platoons, and squads.
@@ -21,11 +21,6 @@ This is a system to play the post-apocalyptic anime inspired ttrpg [Lone Wolf Fi
 - Forgotten what the skills do? Click on them at the side of your character sheet to access both the description and the effect chart.
 - Create custom Artifacts, Techniques, Forms, and Weapons.
 - If you're a GM, edit any non-character sheet by either pressing the edit button in the top right, or selecting the edit tab.
-
-## Known issues
-- The module dice so nice does not work with the dice rolling mechanic - no dice are rolled.
-- Effort and health max cannot be increased for player characters - as a workaround for techniques that change these things, create an npc with the relevant stats.
-- Health bars should display properly, but please let me know if any other issues arise around display of health or other attributes!
 
 ## Licenses
 The majority of this system is distributed under the MIT license, but the assets and packs folders are not. See 'assets/LICENSE-ASSETS.md' and 'packs/LICENSE-PACKS.md' for more information
