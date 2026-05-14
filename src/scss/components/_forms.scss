@@ -4,24 +4,12 @@ table {
   table-layout: fixed;
 }
 
-button {
-  font-family: utils.$font-primary;
-  
-  &#prana-flare {
-    font-size: 12px;
-  }
+button#prana-flare {
+  font-size: 12px;
 }
 
 .flex-wrap {
   flex-wrap: wrap;
-}
-
-.item-form {
-  font-family: utils.$font-primary;
-}
-
-.editor {
-  font-family: utils.$font-secondary;
 }
 
 .edit-container {
@@ -29,6 +17,53 @@ button {
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
+}
+
+
+.lwf-sheet-form {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.lwf-item-sheet-form {
+  .sheet-header {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+
+    .profile-img {
+      flex: 0 0 96px;
+      width: 96px;
+      height: 96px;
+      object-fit: contain;
+    }
+
+    .header-fields {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    h1.charname {
+      margin: 0;
+      min-width: 0;
+
+      input {
+        width: 100%;
+      }
+    }
+  }
+
+  .sheet-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+  }
 }
 
 .imb-main {

@@ -255,8 +255,43 @@
   "manifest": "https://raw.githubusercontent.com/cdrit/lone-wolf-fists/refs/tags/v1.3.0/system.json",
   "download": "https://github.com/cdrit/lone-wolf-fists/releases/download/v1.3.0/lone-wolf-fists.zip",
   "background": "systems/lone-wolf-fists/assets/logo.png",
-  "gridDistance": 5,
-  "gridUnits": "ft",
   "primaryTokenAttribute": "health.value",
-  "secondaryTokenAttribute": "power.lvl"
+  "secondaryTokenAttribute": "power.lvl",
+  "documentTypes": {
+    "Actor": {
+      "character": {},
+      "npc": {},
+      "squad": {},
+      "platoon": {},
+      "vehicle": {},
+      "titan": {},
+      "domain": {}
+    },
+    "Item": {
+      "item": {},
+      "weapon": {},
+      "armor": {},
+      "archetype": {},
+      "clan": {},
+      "technique": {},
+      "form": {},
+      "artifact": {},
+      "ability": {},
+      "gupt-kala": {},
+      "node": {},
+      "imbalance": {},
+      "skill": {},
+      "anatomy": {}
+    },
+    "JournalEntryPage": {
+      "artifact": {},
+      "technique": {},
+      "gupt-kala": {},
+      "move": {}
+    }
+  },
+  "grid": {
+    "distance": 5,
+    "units": "ft"
+  }
 }

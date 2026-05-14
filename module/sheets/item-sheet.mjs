@@ -22,7 +22,7 @@ const LWFItemSheetBase = HandlebarsApplicationMixin(ItemSheetV2);
 
 export class lwfItemSheet extends LWFItemSheetBase {
   static DEFAULT_OPTIONS = {
-    classes: ['lone-wolf-fists', 'sheet', 'item'],
+    classes: ['lone-wolf-fists', 'lwf-item-app'],
     position: { width: 400, height: 600 },
     window: { resizable: true },
     form: {
@@ -45,7 +45,14 @@ export class lwfItemSheet extends LWFItemSheetBase {
     form: { template: '' },
   };
 
-  tabGroups = { primary: 'description' };
+  static DEFAULT_TABS = {
+    artifact: 'core',
+    form: 'overview',
+    technique: 'overview',
+    weapon: 'overview',
+  };
+
+  tabGroups = { primary: this.constructor.DEFAULT_TABS[this.item.type] ?? 'description' };
 
   /** @override */
   get template() {
