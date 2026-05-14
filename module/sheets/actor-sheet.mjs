@@ -24,7 +24,7 @@ const LWFActorSheetBase = HandlebarsApplicationMixin(ActorSheetV2);
  */
 export class lwfActorSheet extends LWFActorSheetBase {
   static DEFAULT_OPTIONS = {
-    classes: ['lone-wolf-fists', 'sheet', 'actor'],
+    classes: ['lone-wolf-fists', 'lwf-actor-app'],
     position: { width: 830, height: 800 },
     window: { resizable: true },
     form: {
