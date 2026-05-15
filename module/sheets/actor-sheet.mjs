@@ -561,6 +561,7 @@ export class lwfActorSheet extends LWFActorSheetBase {
   async _onRender(context, options) {
     await super._onRender(context, options);
     this._activateSheetTabs();
+    this._activateImagePicker();
     this.activateListeners($(this.element));
   }
 
@@ -593,7 +594,7 @@ export class lwfActorSheet extends LWFActorSheetBase {
 
       activateTab(this.tabGroups[group] ?? tabs[0].dataset.tab);
 
-      nav.addEventListener('click', (event) => {
+      nav.onclick = (event) => {
         const tab = event.target.closest('[data-tab]');
         if (!tab || !nav.contains(tab)) return;
 
@@ -605,8 +606,33 @@ export class lwfActorSheet extends LWFActorSheetBase {
           this.tabGroups[group] = tabId;
         }
         activateTab(this.tabGroups[group] ?? tabId);
-      });
+      };
     }
+  }
+
+  _activateImagePicker() {
+    const root = this.element;
+    if (!root || !this.isEditable) return;
+
+    for (const image of root.querySelectorAll('[data-edit="img"]')) {
+      image.setAttribute('role', 'button');
+      image.setAttribute('tabindex', '0');
+      image.onclick = (event) => this._onEditImage(event);
+      image.onkeydown = (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        this._onEditImage(event);
+      };
+    }
+  }
+
+  _onEditImage(event) {
+    event.preventDefault();
+    const picker = new FilePicker({
+      type: 'image',
+      current: this.actor.img,
+      callback: (path) => this.actor.update({ img: path })
+    });
+    return picker.browse(this.actor.img);
   }
 
   async _onSubmit(event, form, formData) {
@@ -1077,6 +1103,24 @@ export class lwfActorSheet extends LWFActorSheetBase {
       });
       return roll;
     }
+  }
+
+  async _onDropItem(event, data) {
+    if (!this.actor.isOwner) return false;
+    const item = await Item.implementation.fromDropData(data);
+    if (!item) return false;
+
+    const itemData = item.toObject();
+    if (this.actor.type === 'character' && itemData.type === 'clan') {
+      const items = this.actor.items.filter(i => i.type !== 'clan').map(i => i.toObject());
+      items.push(itemData);
+      return this.actor.update({
+        'system.clan': itemData.system?.clan || itemData.name,
+        items
+      });
+    }
+
+    return super._onDropItem(event, data);
   }
 
   async _onDropActor(event, data) {
