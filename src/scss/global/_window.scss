@@ -77,11 +77,31 @@
 
   .popup-choice {
     cursor: pointer;
+
+    input[type="checkbox"],
+    input[type="radio"] {
+      flex: 0 0 auto;
+      margin: 0;
+    }
+
+    span {
+      flex: 1 1 auto;
+    }
   }
 
   .hint {
     flex-basis: 100%;
     font-size: 12px;
     margin: 0 0 0 24px;
+  }
+}
+
+
+[data-edit="img"] {
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    box-shadow: 0 0 8px red;
   }
 }

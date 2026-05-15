@@ -69,10 +69,28 @@
   cursor: pointer;
 }
 
+.lwf-popup-form .popup-choice input[type=checkbox],
+.lwf-popup-form .popup-choice input[type=radio] {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.lwf-popup-form .popup-choice span {
+  flex: 1 1 auto;
+}
+
 .lwf-popup-form .hint {
   flex-basis: 100%;
   font-size: 12px;
   margin: 0 0 0 24px;
+}
+
+[data-edit=img] {
+  cursor: pointer;
+}
+
+[data-edit=img]:hover, [data-edit=img]:focus {
+  box-shadow: 0 0 8px red;
 }
 
 .grid,

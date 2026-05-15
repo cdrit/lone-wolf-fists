@@ -9,7 +9,7 @@ export default class lwfClan extends lwfItemBase {
     schema.clan = new StringField();
     schema.deed = new HTMLField();
     schema.vice = new HTMLField();
-    schema.landmark - new HTMLField();
+    schema.landmark = new HTMLField();
 
     return schema;
   }

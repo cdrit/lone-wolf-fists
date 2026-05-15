@@ -172,7 +172,77 @@ export class lwfItemSheet extends LWFItemSheetBase {
   /** @override */
   async _onRender(context, options) {
     await super._onRender(context, options);
+    this._activateSheetTabs();
+    this._activateImagePicker();
     this.activateListeners($(this.element));
+  }
+
+  /**
+   * Activate tabbed navigation for item sheets.
+   *
+   * The item templates keep the tab group on the nav element, so mirror the
+   * actor-sheet compatibility shim here as well.
+   */
+  _activateSheetTabs() {
+    const root = this.element;
+    if (!root) return;
+
+    for (const nav of root.querySelectorAll('.tabs[data-group]')) {
+      const group = nav.dataset.group;
+      const tabs = nav.querySelectorAll('[data-tab]');
+      if (!group || !tabs.length) continue;
+
+      const activateTab = (tabId) => {
+        this.tabGroups[group] = tabId;
+        for (const tab of tabs) {
+          tab.classList.toggle('active', tab.dataset.tab === tabId);
+        }
+        for (const panel of root.querySelectorAll(`.tab[data-group="${group}"]`)) {
+          panel.classList.toggle('active', panel.dataset.tab === tabId);
+        }
+      };
+
+      activateTab(this.tabGroups[group] ?? tabs[0].dataset.tab);
+
+      nav.onclick = (event) => {
+        const tab = event.target.closest('[data-tab]');
+        if (!tab || !nav.contains(tab)) return;
+
+        event.preventDefault();
+        const tabId = tab.dataset.tab;
+        try {
+          this.changeTab(tabId, group, { event, navElement: tab, updatePosition: true });
+        } catch (_err) {
+          this.tabGroups[group] = tabId;
+        }
+        activateTab(this.tabGroups[group] ?? tabId);
+      };
+    }
+  }
+
+  _activateImagePicker() {
+    const root = this.element;
+    if (!root || !this.isEditable) return;
+
+    for (const image of root.querySelectorAll('[data-edit="img"]')) {
+      image.setAttribute('role', 'button');
+      image.setAttribute('tabindex', '0');
+      image.onclick = (event) => this._onEditImage(event);
+      image.onkeydown = (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        this._onEditImage(event);
+      };
+    }
+  }
+
+  _onEditImage(event) {
+    event.preventDefault();
+    const picker = new FilePicker({
+      type: 'image',
+      current: this.item.img,
+      callback: (path) => this.item.update({ img: path })
+    });
+    return picker.browse(this.item.img);
   }
 
   async _onSubmit(event, form, formData) {
@@ -213,25 +283,10 @@ export class lwfItemSheet extends LWFItemSheetBase {
     // Roll handlers, click handlers, etc. would go here.
 
 
-    // Change imbalance data when the data is altered on the sheet
-    html.on('change', '.item-choice', async (ev) =>{      
-      const tr = $(ev.currentTarget).parents('.sheet')[0].id;
-      const id = tr.substring(tr.indexOf('-') + 1).replaceAll('-', '.');
-      
-      const item = fromUuidSync(id);
-      
-      // The following if statement is used to detect if the chosen element is selected or not
-      // If there is a better way to do this, lmk
-      let update;
-      if(ev.currentTarget.type === "checkbox")
-        update = $(ev.currentTarget).prop('checked');
-      else if (ev.currentTarget.nodeName !== "SELECT")
-        update = ev.currentTarget.value;
-      else
-        update = $(ev.currentTarget).find(":selected")[0].value;
-      const target = ev.currentTarget.dataset.techstat;
-      await item.update({ [`system.${target}`]: update});
-    });
+    // Standard named form controls are submitted by ApplicationV2.
+    // Avoid a parallel manual item-choice updater here; it caused typed values
+    // to be overwritten during rerenders on item sheets.
+
 
 
     // Leaving this here as an example of creating an active effect
